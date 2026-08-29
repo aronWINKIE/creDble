@@ -530,6 +530,13 @@ td.num{ font-family:var(--font-display); font-weight:700; font-variant-numeric:t
 .sheet-actions.sticky-actions{ position:sticky; bottom:0; margin:0 -2px -2px; padding:12px 2px 2px; background:linear-gradient(180deg,rgba(12,18,33,0),var(--glass-strong) 28%); z-index:4; flex:0 0 auto; }
 body.sheet-open{overflow:hidden;}
 @media(min-width:1025px){#cardBreakdownOverlay{display:none!important;}}
+@media(min-width:1025px){
+  #paymentConfirmOverlay{align-items:center;padding:24px;}
+  #paymentConfirmSheet{width:min(460px,100%);max-width:460px;max-height:min(88vh,620px);border-radius:24px;transform:translateY(12px) scale(.98);padding:22px 22px 20px;}
+  #paymentConfirmOverlay.open #paymentConfirmSheet{transform:translateY(0) scale(1);}
+  #paymentConfirmSheet .sheet-handle{display:none;}
+  #paymentConfirmSheet .sheet-actions{margin-top:20px;}
+}
 /* ===== PREMIUM MOBILE CARD BREAKDOWN ===== */
 .card-breakdown-sheet{ padding-bottom:max(16px, env(safe-area-inset-bottom)); }
 .card-breakdown-hero{
@@ -904,6 +911,25 @@ body.sheet-open{overflow:hidden;}
 .confirm-amount{font-family:var(--font-display);font-size:22px;font-weight:800;margin:2px 0}
 .confirm-date{font-size:11px;color:var(--text-faint)}
 
+
+/* SMART PURCHASE AI */
+.smart-ai{margin-top:10px;padding:12px;border:1px solid var(--border);border-radius:14px;background:var(--surface-2)}
+.smart-ai-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.smart-ai-title{font-weight:800;font-size:12px}.smart-ai-sub{font-size:10px;color:var(--text-faint);margin-top:2px}
+.smart-ai-input{display:flex;gap:7px}.smart-ai-input input{flex:1;min-width:0;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:9px 10px;color:var(--text);font:inherit;font-size:12px;outline:none}
+.smart-ai-input input:focus{border-color:var(--indigo)}
+.smart-ai-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.smart-chip{border:1px solid var(--border);background:var(--surface);color:var(--text-dim);border-radius:999px;padding:6px 9px;font-size:10px;font-weight:700;cursor:pointer}
+.smart-chip:hover{border-color:var(--indigo);color:var(--text);background:var(--indigo-soft)}
+.smart-suggestions{display:flex;flex-direction:column;gap:6px;margin-top:9px}
+.smart-suggestion{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 10px;border:1px solid var(--border);border-radius:10px;background:var(--surface);cursor:pointer}
+.smart-suggestion:hover{border-color:var(--indigo)}
+.smart-suggestion-main{min-width:0}.smart-suggestion-name{font-weight:750;font-size:11.5px}.smart-suggestion-meta{font-size:9.5px;color:var(--text-faint);margin-top:2px}
+.smart-suggestion-price{font-family:var(--font-display);font-weight:800;font-size:11px;white-space:nowrap}
+.smart-tip{margin-top:9px;padding:9px 10px;border-radius:10px;background:var(--indigo-soft);font-size:10.5px;line-height:1.5;color:var(--text-dim)}
+.smart-badge{display:inline-flex;align-items:center;padding:3px 6px;border-radius:999px;background:var(--surface);border:1px solid var(--border);font-size:8.5px;font-weight:800;color:var(--text-faint);margin-left:5px}
+@media(max-width:480px){.smart-ai-input{flex-direction:column}.smart-ai-input .btn{width:100%}}
+
 </style>
 </head>
 <body>
@@ -1256,6 +1282,17 @@ body.sheet-open{overflow:hidden;}
       <div class="field" id="fTermWrap">
         <label>Term (months)</label>
         <input type="number" id="fTerm" placeholder="e.g. 12 months" min="2" max="60" value="12">
+      </div>
+      
+      <div class="smart-ai" id="purchaseSmartAI">
+        <div class="smart-ai-head"><div><div class="smart-ai-title">✨ Smart Purchase AI</div><div class="smart-ai-sub">Type naturally — Tagalog, Bisaya/Cebuano, Ilocano, Hiligaynon, Waray, Kapampangan, Pangasinan or English.</div></div></div>
+        <div class="smart-ai-input"><input id="smartPurchaseInput" type="text" placeholder="e.g. bili ko iPhone 16 60k 12 months para kay Carlo"><button type="button" class="btn btn-primary" id="smartPurchaseAsk">✨ Analyze</button></div>
+        <div class="smart-ai-actions">
+          <button type="button" class="smart-chip" data-smart-example="iPhone 16 60k 12 months para kay Carlo">Try example</button>
+          <button type="button" class="smart-chip" data-smart-example="palit laptop mga 50k 24 months">Laptop</button>
+          <button type="button" class="smart-chip" data-smart-example="ref 40k 12 mos">Appliance</button>
+        </div>
+        <div id="smartPurchaseResult"></div>
       </div>
       </div>
       <div class="sheet-actions sticky-actions" style="margin-top:6px;">
@@ -1762,6 +1799,7 @@ function renderTableAndList(){
    ============================================================ */
 let currentCardBreakdown=null;
 let pendingPaymentAction=null;
+let pendingImportedPaymentAction=null;
 
 function openCardBreakdown(cardId){
   currentCardBreakdown=cardId; renderCardBreakdown();
@@ -1825,7 +1863,7 @@ function openPaymentConfirm(cardId,itemId,index){
     saveState();renderAll();closePaymentConfirm();renderScheduleSheet();toast(`Payment ${p.index+1} marked as paid`);
   };
 }
-function closePaymentConfirm(){document.getElementById('paymentConfirmOverlay').classList.remove('open');pendingPaymentAction=null;}
+function closePaymentConfirm(){document.getElementById('paymentConfirmOverlay').classList.remove('open');pendingPaymentAction=null;pendingImportedPaymentAction=null;}
 
 function openAiPaidCorrection(cardId,itemId,index){
   const item=findItem(cardId,itemId); if(!item)return;
@@ -2220,6 +2258,43 @@ function getImportedFiltered(){
   });
   return rows;
 }
+function openImportedPaymentConfirm(row){
+  if(!row) return;
+  const sheet=document.getElementById('paymentConfirmSheet');
+  const markingPaid=!row.paid;
+  pendingImportedPaymentAction={row,markingPaid};
+  sheet.innerHTML=`
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><div>
+      <div class="sheet-title">${markingPaid?'Mark Payment as Paid?':'Mark Payment as Unpaid?'}</div>
+      <div class="sheet-title-sub">${escAI(row.itemName||row.name||'Payment')}${row.merchant?' · '+escAI(row.merchant):''}</div>
+    </div><button class="sheet-close" id="payConfirmClose"><span class="icon"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></span></button></div>
+    <p class="confirm-copy">Are you sure you want to ${markingPaid?'mark this payment as paid':'mark this payment as unpaid'}? This action will update the payment status.</p>
+    <div class="confirm-amount">${fmt(Number(row.amount)||0)}</div>
+    <div class="confirm-date">${row.date?escAI(String(row.date)):'Payment status'}</div>
+    <div class="sheet-actions"><button class="btn" id="payConfirmCancel">Cancel</button><button class="btn primary" id="payConfirmYes">${markingPaid?'Yes, Mark Paid':'Yes, Mark Unpaid'}</button></div>`;
+  document.getElementById('paymentConfirmOverlay').classList.add('open');
+  sheet.querySelector('#payConfirmClose').onclick=closePaymentConfirm;
+  sheet.querySelector('#payConfirmCancel').onclick=closePaymentConfirm;
+  sheet.querySelector('#payConfirmYes').onclick=()=>{
+    const action=pendingImportedPaymentAction;
+    if(!action||!action.row)return;
+    action.row.paid=action.markingPaid;
+    action.row.paidAt=action.markingPaid?new Date().toISOString():null;
+    const card=state.cards.find(c=>c.id===action.row.cardId);
+    const item=card?.items.find(i=>(action.row.groupId&&i.groupId===action.row.groupId)||i.id===action.row.id);
+    if(item){
+      const m=String(action.row.name||'').match(/^(\d+)\s*of\s*(\d+)$/i);
+      const idx=m?parseInt(m[1],10)-1:0;
+      if(item.paid[idx]!==undefined) item.paid[idx]=action.markingPaid;
+      if(!item.paidAt)item.paidAt=[];
+      item.paidAt[idx]=action.row.paidAt;
+    }
+    saveState();renderAll();renderImportedViews();closePaymentConfirm();
+    toast(action.markingPaid?'Marked as paid':'Marked as unpaid');
+  };
+}
+
 function setImportedPaid(row){
   row.paid=!row.paid; row.paidAt=row.paid?new Date().toISOString():null;
   const card=state.cards.find(c=>c.id===row.cardId);
@@ -2265,7 +2340,7 @@ function renderImportedViews(){
       const body = g.rows.map((r,gi)=>{ const i=g.indices[gi]; return `<tr class="data-row"><td><input class="paid-check" type="checkbox" ${r.paid?'checked':''} data-xrow="${i}"><span class="paid-time">${r.paidAt?new Date(r.paidAt).toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short'}):''}</span></td><td>${r.date}</td><td>${r.name}</td><td>${r.merchant}</td><td>${r.borrowerName||'—'}</td><td class="amount">${fmt(r.amount)}</td></tr>`; }).join('');
       return header+body;
     }).join('')}</tbody></table>`;
-    excel.querySelectorAll('.paid-check').forEach((el,i)=>el.addEventListener('click',e=>{e.stopPropagation();setImportedPaid(rows[i]);}));
+    excel.querySelectorAll('.paid-check').forEach((el,i)=>el.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();openImportedPaymentConfirm(rows[i]);}));
   } else if(currentView==='checklist'){
     checklist.style.display='flex'; checklist.style.flexDirection='column'; checklist.style.gap='14px';
     checklist.innerHTML=groups.map(g=>{
@@ -2274,7 +2349,7 @@ function renderImportedViews(){
       const items = g.rows.map((r,gi)=>{ const i=g.indices[gi]; return `<div class="check-item"><input class="paid-check" type="checkbox" ${r.paid?'checked':''} data-i="${i}"><div class="check-main"><div class="check-name">${r.merchant}</div><div class="check-sub">${r.date} · ${r.name} · ${r.sheet}${r.borrowerName?' · '+r.borrowerName:''}</div></div><div class="check-right"><div class="check-amt">${fmt(r.amount)}</div><div class="check-paid">${r.paid?(r.paidAt?'Paid · '+new Date(r.paidAt).toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short'}):'Paid'): 'Unpaid'}</div></div></div>`; }).join('');
       return `<div class="check-group">${header}<div class="check-group-body">${items}</div></div>`;
     }).join('');
-    checklist.querySelectorAll('.paid-check').forEach((el,i)=>el.addEventListener('click',()=>setImportedPaid(rows[i])));
+    checklist.querySelectorAll('.paid-check').forEach((el,i)=>el.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();openImportedPaymentConfirm(rows[i]);}));
   } else {
     cycles.style.display='flex';
     const cgroups={}; rows.forEach(r=>{const key=`${r.sheet} · ${r.cycle}`;(cgroups[key]??=[]).push(r);});
@@ -2368,6 +2443,122 @@ function aiNameFromQuestion(q){
   const hit=borrowers.find(b=>nq.includes(normAI(b.name)));
   return hit?.name || '';
 }
+
+/* ============================================================
+   SMART PURCHASE AI — offline natural-language purchase helper
+   Understands common Filipino/English wording and dialect cues.
+   Price suggestions are estimates, not live market quotes.
+   ============================================================ */
+const SMART_PURCHASE_CATALOG = [
+  {keys:['iphone','iphone 15','iphone 16','iphone 17'],name:'iPhone / Smartphone',category:'Electronics',min:15000,max:90000},
+  {keys:['samsung','galaxy','android phone','cellphone','cp','phone'],name:'Smartphone',category:'Electronics',min:5000,max:80000},
+  {keys:['laptop','macbook','notebook','computer','pc'],name:'Laptop / Computer',category:'Electronics',min:18000,max:120000},
+  {keys:['ipad','tablet'],name:'Tablet / iPad',category:'Electronics',min:9000,max:70000},
+  {keys:['tv','television','smart tv'],name:'Smart TV',category:'Appliances',min:12000,max:90000},
+  {keys:['ref','refrigerator','fridge'],name:'Refrigerator',category:'Appliances',min:18000,max:100000},
+  {keys:['washing machine','washer','laundry'],name:'Washing Machine',category:'Appliances',min:12000,max:60000},
+  {keys:['aircon','air conditioner','ac'],name:'Air Conditioner',category:'Appliances',min:18000,max:90000},
+  {keys:['motor','motorcycle','motorbike'],name:'Motorcycle',category:'Transport',min:50000,max:180000},
+  {keys:['bike','bicycle'],name:'Bicycle',category:'Transport',min:5000,max:80000},
+  {keys:['furniture','sofa','bed','mattress'],name:'Furniture',category:'Home',min:5000,max:80000},
+  {keys:['appliance','appliances'],name:'Home Appliance',category:'Appliances',min:3000,max:70000},
+  {keys:['grocery','groceries','food','palengke'],name:'Groceries / Food',category:'Household',min:500,max:15000},
+  {keys:['travel','flight','airfare','bakasyon','vacation','hotel'],name:'Travel / Vacation',category:'Travel',min:3000,max:100000},
+  {keys:['tuition','school','enrollment','matrikula'],name:'School / Tuition',category:'Education',min:5000,max:100000},
+  {keys:['camera'],name:'Camera',category:'Electronics',min:15000,max:150000},
+  {keys:['watch'],name:'Watch',category:'Personal',min:1000,max:100000},
+  {keys:['jewelry','jewellery','alahas'],name:'Jewelry',category:'Personal',min:2000,max:200000}
+];
+const SMART_DIALECT_WORDS={
+  tagalog:['bili','bilhin','palit','bumili','pambili','magkano','halaga','presyo','para kay','kay','months','buwan','hulugan','kaskas','gamit'],
+  bisaya:['palit','bakal','paliton','palita','pila','tagpila','presyo','kwarta','para ni','para kang','bulan','bayranan','hulog','utang','gamit'],
+  ilocano:['gumatang','gatang','gatangen','magapa','mano','presio','kwarta','bulan','bayad','pambayad','para ken','ken'],
+  hiligaynon:['bakal','baklon','pila','tagpila','presyo','kwarta','bulan','bayad','para kay','kay'],
+  waray:['palit','pira','presyo','kwarta','bulan','bayad','para kan','kan'],
+  kapampangan:['bili','pilan','magkanu','presyu','bulan','bayad','para keng','keng'],
+  pangasinan:['balin','gumatang','mano','presyo','kwarta','bulan','bayad','para ed','ed']
+};
+function smartNorm(s){return normAI(String(s||'').replace(/₱/g,' php ').replace(/,/g,''));}
+function smartDetectDialect(q){
+  const n=smartNorm(q); let best='english',score=0;
+  Object.entries(SMART_DIALECT_WORDS).forEach(([lang,words])=>{let sc=words.reduce((a,w)=>a+(n.includes(w)?1:0),0);if(sc>score){score=sc;best=lang;}});
+  if(/\b(ako|ko|mo|ni|ng|ang|mga|para|bili|palit|magkano|ilan|buwan|hulugan|kaskas)\b/.test(n) && best==='english') best='tagalog';
+  return {lang:best,confidence:score};
+}
+function smartParseAmount(q){
+  const n=smartNorm(q);
+  const re=/(?:₱|php|p)?\s*(\d+(?:\.\d+)?)\s*(k|k\b|thousand|m|m\b|million)?/gi;
+  let m,best=null; while((m=re.exec(n))){let v=parseFloat(m[1]);const u=(m[2]||'').toLowerCase();if(u==='k'||u==='thousand')v*=1000;if(u==='m'||u==='million')v*=1000000;if(v>=100) best=v;}
+  return best;
+}
+function smartParseTerm(q){
+  const n=smartNorm(q); let m=n.match(/(\d+)\s*(?:months?|mos?|mo\b|buwan|bulan)/i);
+  if(!m) m=n.match(/(?:hulugan|installment|terms?|term)\s*(?:ng|of)?\s*(\d+)/i);
+  if(!m) m=n.match(/(\d+)\s*(?:x|times)\s*(?:hulog|bayad)/i);
+  const v=m?parseInt(m[1],10):null; return v&&v>=2&&v<=60?v:null;
+}
+function smartParseBorrower(q){
+  const n=String(q||'');
+  const m=n.match(/(?:para\s+(?:kay|ni|kan|ken|keng|kang)|for\s+|borrower\s*[:=-]?\s*|user\s*[:=-]?\s*)([^,;]+?)(?=\s+(?:at|and|ng|na|mga|worth|amount|₱|php|\d)|[,;]|$)/i);
+  if(m)return m[1].trim().replace(/[.?!]+$/,'');
+  return '';
+}
+function smartCatalogMatches(q){
+  const n=smartNorm(q);
+  return SMART_PURCHASE_CATALOG.map(x=>({...x,score:x.keys.reduce((a,k)=>a+(n.includes(smartNorm(k))?1:0),0)})).filter(x=>x.score).sort((a,b)=>b.score-a.score);
+}
+function smartPriceText(x){return `${fmt(x.min)}–${fmt(x.max)}`;}
+function smartFindSimilar(itemName,category){
+  const n=smartNorm(itemName);
+  const items=aiUniqueItems().filter(x=>{const a=smartNorm(x.item.name);const c=smartNorm(x.item.category);return (n&&a.includes(n))||(category&&c===smartNorm(category));});
+  return items.slice(0,3);
+}
+function smartPurchaseTips(amount,term,cardId,category){
+  const tips=[]; const card=findCard(cardId);
+  if(amount&&card){const c=computeCard(card); if(amount>c.available) tips.push(`<b>⚠️ Over limit:</b> ${fmt(amount)} is above this account's current available credit of ${fmt(c.available)}.`); else if(c.available>0 && amount/c.available>=.5) tips.push(`<b>Heads up:</b> this purchase would use about <b>${Math.round(amount/c.available*100)}%</b> of the currently available credit on ${escAI(card.bank)}.`);}
+  if(amount&&term){const monthly=amount/term; tips.push(`<b>Monthly estimate:</b> ${fmt(monthly)}/month before any interest, fees, or bank-specific installment charges.`);}
+  if(amount>=50000) tips.push(`<b>Large purchase:</b> double-check the final merchant price, installment rate, fees, and available credit before saving.`);
+  if(!term && amount) tips.push(`<b>Term tip:</b> add a term if this is installment so creDble can calculate monthly payments and due dates.`);
+  const similar=smartFindSimilar(document.getElementById('fName')?.value||'',category);
+  if(similar.length) tips.push(`<b>History:</b> creDble found ${similar.length} similar item${similar.length>1?'s':''} in your existing ledger.`);
+  return tips.length?`<div class="smart-tip">${tips.join('<br><br>')}</div>`:'';
+}
+function smartAnalyzePurchase(query){
+  const q=String(query||'').trim(); if(!q)return '<div class="smart-tip">Type what you want to buy, for example: <b>“palit laptop 50k 24 months para kay Carlo”</b>.</div>';
+  const dialect=smartDetectDialect(q), amount=smartParseAmount(q), term=smartParseTerm(q), borrower=smartParseBorrower(q), matches=smartCatalogMatches(q);
+  const top=matches[0]; const nameGuess=top?top.name:'';
+  const cleanName=q.replace(/(?:₱|php)?\s*\d+(?:\.\d+)?\s*(?:k|thousand|m|million)?/gi,'').replace(/\b\d+\s*(?:months?|mos?|mo\b|buwan|bulan|x)\b/gi,'').replace(/(?:para\s+(?:kay|ni|kan|ken|keng|kang)|for\s+|borrower\s*[:=-]?\s*|user\s*[:=-]?\s*)[^,;]+/i,'').trim();
+  const guessedName=cleanName.length>1?cleanName.replace(/\b(?:bili|bilhin|palit|bumili|bakal|paliton|gumatang|gatang|magkano|presyo|kwarta|hulugan|installment|please|pls|paki|ko|ako|mo|ni|kay|para|kan|ken|keng|kang)\b/gi,' ').replace(/\s+/g,' ').trim():'';
+  const finalName=guessedName||nameGuess||'New purchase';
+  const category=top?.category||'Other';
+  const price=amount?`<b>${fmt(amount)}</b>`:(top?`<b>${smartPriceText(top)}</b><span class="smart-badge">estimated range</span>`:'<b>Not detected</b>');
+  const langLabel={tagalog:'Tagalog',bisaya:'Bisaya / Cebuano',ilocano:'Ilocano',hiligaynon:'Hiligaynon',waray:'Waray',kapampangan:'Kapampangan',pangasinan:'Pangasinan',english:'English'}[dialect.lang]||'English';
+  let html=`<div class="smart-tip"><b>AI understood:</b> ${escAI(langLabel)} · ${amount?`Amount ${price}`:'No exact amount yet'}${term?` · ${term} months`:''}${borrower?` · for ${escAI(borrower)}`:''}</div>`;
+  if(!amount && top) html+=`<div class="smart-suggestions"><div class="smart-suggestion" data-smart-fill='${JSON.stringify({name:top.name,category:top.category,amount:Math.round((top.min+top.max)/2),term:term||12,borrower}).replace(/'/g,'&#39;')}'><div class="smart-suggestion-main"><div class="smart-suggestion-name">${escAI(top.name)}</div><div class="smart-suggestion-meta">${escAI(top.category)} · estimated Philippine range</div></div><div class="smart-suggestion-price">${smartPriceText(top)}</div></div></div>`;
+  html+=`<div class="smart-actions" style="display:flex;gap:7px;flex-wrap:wrap;margin-top:9px"><button type="button" class="btn btn-primary" id="smartApplyBtn">Apply to form</button><button type="button" class="btn" id="smartTipBtn">Show tips</button></div>`;
+  setTimeout(()=>{
+    const apply=document.getElementById('smartApplyBtn'); if(apply)apply.onclick=()=>smartApplyPurchase({name:finalName,category,amount,term:term||12,borrower});
+    const tip=document.getElementById('smartTipBtn'); if(tip)tip.onclick=()=>{document.getElementById('smartPurchaseResult').insertAdjacentHTML('beforeend',smartPurchaseTips(amount,term,document.getElementById('fCard').value,category));};
+    document.querySelectorAll('[data-smart-fill]').forEach(el=>el.onclick=()=>{try{smartApplyPurchase(JSON.parse(el.dataset.smartFill));}catch(e){}});
+  },0);
+  return html;
+}
+function smartApplyPurchase(data){
+  const name=data.name&&data.name!=='New purchase'?data.name:'';
+  if(name)document.getElementById('fName').value=name;
+  if(data.category)document.getElementById('fCategory').value=data.category;
+  if(data.amount)document.getElementById('fAmount').value=Math.round(data.amount*100)/100;
+  if(data.borrower)document.getElementById('fBorrower').value=data.borrower;
+  if(data.term){document.getElementById('fTerm').value=data.term;document.getElementById('fTermWrap').style.display='';document.querySelectorAll('#fTypeSeg .seg-btn').forEach(b=>b.classList.toggle('active',b.dataset.type==='installment'));addFormType='installment';}
+  document.getElementById('smartPurchaseResult').innerHTML='<div class="smart-tip"><b>✓ Applied.</b> Review the fields before adding the purchase. AI does not save anything automatically.</div>'+smartPurchaseTips(data.amount,data.term,document.getElementById('fCard').value,data.category);
+}
+function smartLiveSuggestions(){
+  const q=document.getElementById('fName')?.value||''; if(q.length<2)return; const m=smartCatalogMatches(q).slice(0,3); if(!m.length)return;
+  const box=document.getElementById('smartPurchaseResult');
+  box.innerHTML='<div class="smart-suggestions">'+m.map(x=>`<div class="smart-suggestion" data-smart-quick='${JSON.stringify({name:x.name,category:x.category,amount:Math.round((x.min+x.max)/2),term:12}).replace(/'/g,'&#39;')}'><div class="smart-suggestion-main"><div class="smart-suggestion-name">${escAI(x.name)}</div><div class="smart-suggestion-meta">${escAI(x.category)} · estimated range</div></div><div class="smart-suggestion-price">${smartPriceText(x)}</div></div>`).join('')+'</div>';
+  box.querySelectorAll('[data-smart-quick]').forEach(el=>el.onclick=()=>{try{smartApplyPurchase(JSON.parse(el.dataset.smartQuick));}catch(e){}});
+}
+
 function answerAI(question){
   const q=(question||'').trim(); if(!q) return 'Please ask a question first.';
   const nq=normAI(q);
@@ -2441,8 +2632,9 @@ function answerAI(question){
     const unpaid=allItems.filter(x=>x.calc.remaining>0).length;
     return `<strong>creDble summary</strong><div class="ai-kpi"><div><span class="ai-label">Accounts</span><b>${state.cards.length}</b></div><div><span class="ai-label">Used</span><b>${fmt(totals.used)}</b></div><div><span class="ai-label">Available</span><b>${fmt(totals.available)}</b></div></div><div style="margin-top:10px">${allItems.length} unique items · ${unpaid} with remaining balance · ${totals.overdue} overdue.</div>`;
   }
-  if(/how many|count|ilan|ilang/i.test(nq)){
-    return `I found <strong>${state.cards.length}</strong> accounts, <strong>${allItems.length}</strong> unique ledger items, and <strong>${allBorrowers().length}</strong> card users in the loaded data.`;
+  if(/how many|count|ilan|ilang|pila|mano|tagpila|magkano|presyo|gumatang|bakal|palit|paliton|hulugan|installment|bayad|kwarta|bulan|buwan/i.test(nq)){
+    const sp=smartAnalyzePurchase(q);
+    return `<strong>creDble AI understands this as a purchase/planning question.</strong>${sp}<div style="margin-top:8px;color:var(--text-faint);font-size:10.5px">Language cues are detected automatically. Price ranges are offline estimates; verify the actual merchant price.</div>`;
   }
   return `<strong>creDble AI has access to the loaded ledger data.</strong><div style="margin-top:8px">Try questions like:<br>• “Ilan pa balance ni Anthony Reyes?”<br>• “Show all purchases ni Anthony Reyes”<br>• “Sino ang may pinakamalaking balance?”<br>• “Ano ang laman ng BPI?”<br>• “Sino ang overdue?”<br>• “Magkano lahat ng balance?”</div>`;
 }
@@ -2896,6 +3088,16 @@ document.getElementById('aiOverlay').addEventListener('click',e=>{if(e.target.id
 document.getElementById('aiAsk').onclick=()=>{document.getElementById('aiResult').innerHTML=answerAI(document.getElementById('aiInput').value);};
 document.getElementById('aiClear').onclick=()=>{document.getElementById('aiInput').value='';document.getElementById('aiResult').innerHTML='Try: <strong>“ilan pa balance ni Anthony Reyes”</strong>';document.getElementById('aiInput').focus();};
 document.getElementById('aiInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('aiAsk').click();});
+const smartInput=document.getElementById('smartPurchaseInput');
+const smartResult=document.getElementById('smartPurchaseResult');
+if(smartInput){
+  document.getElementById('smartPurchaseAsk').onclick=()=>{smartResult.innerHTML=smartAnalyzePurchase(smartInput.value);};
+  smartInput.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('smartPurchaseAsk').click();});
+  document.querySelectorAll('[data-smart-example]').forEach(b=>b.onclick=()=>{smartInput.value=b.dataset.smartExample;document.getElementById('smartPurchaseAsk').click();});
+}
+const fNameSmart=document.getElementById('fName');
+if(fNameSmart){let smartTimer;fNameSmart.addEventListener('input',()=>{clearTimeout(smartTimer);smartTimer=setTimeout(smartLiveSuggestions,250);});}
+
 document.getElementById('btnReminder').onclick=openReminder;
 document.getElementById('btnNotifications').onclick=()=>{renderNotifications();document.getElementById('notificationOverlay').classList.add('open');};
 document.getElementById('notificationClose').onclick=()=>document.getElementById('notificationOverlay').classList.remove('open');
@@ -2917,3 +3119,6 @@ renderAll();
 </script>
 </body>
 </html>
+
+
+fix mobile user interface para sa clicking ng payment check box -- dapat may pop up yes para sa web at mol=bile to ensure na tama ang payment ng user
