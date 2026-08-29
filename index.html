@@ -423,7 +423,11 @@ button{ font-family:inherit; }
 .wc-avail{ font-family:var(--font-display); font-size:18px; font-weight:800; color:#fff; margin-top:1px; }
 .wc-bar{ height:5px; border-radius:4px; background:rgba(255,255,255,0.22); margin-top:8px; overflow:hidden; }
 .wc-bar-fill{ height:100%; background:#fff; border-radius:4px; }
+.wc-details-cta{font-size:9px;color:rgba(255,255,255,.78);margin-top:7px;display:flex;justify-content:flex-end;align-items:center;gap:3px;font-weight:700;letter-spacing:.02em;}
+.wc-details-cta span{font-size:14px;line-height:8px;}
 
+.wc-details-cta{font-size:9px;color:rgba(255,255,255,.78);margin-top:7px;display:flex;justify-content:flex-end;align-items:center;gap:3px;font-weight:700;letter-spacing:.02em;}
+.wc-details-cta span{font-size:14px;line-height:8px;}
 /* ---------- RIGHT COL: control panel + table ---------- */
 .control-bar{
   display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:16px;
@@ -524,6 +528,52 @@ td.num{ font-family:var(--font-display); font-weight:700; font-variant-numeric:t
 .sheet-scroll::-webkit-scrollbar{ width:6px; }
 .sheet-scroll::-webkit-scrollbar-thumb{ background:rgba(148,163,184,.22); border-radius:8px; }
 .sheet-actions.sticky-actions{ position:sticky; bottom:0; margin:0 -2px -2px; padding:12px 2px 2px; background:linear-gradient(180deg,rgba(12,18,33,0),var(--glass-strong) 28%); z-index:4; flex:0 0 auto; }
+body.sheet-open{overflow:hidden;}
+@media(min-width:1025px){#cardBreakdownOverlay{display:none!important;}}
+/* ===== PREMIUM MOBILE CARD BREAKDOWN ===== */
+.card-breakdown-sheet{ padding-bottom:max(16px, env(safe-area-inset-bottom)); }
+.card-breakdown-hero{
+  position:relative; overflow:hidden; border-radius:18px; padding:18px; color:#fff; margin-bottom:14px;
+  box-shadow:0 18px 40px -18px rgba(15,23,42,.55);
+}
+.card-breakdown-hero::after{content:'';position:absolute;width:170px;height:170px;border-radius:50%;right:-65px;top:-75px;background:rgba(255,255,255,.10);}
+.cbh-top{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+.cbh-bank{font-family:var(--font-display);font-size:18px;font-weight:800;letter-spacing:-.02em;}
+.cbh-type{font-size:10px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.07em;margin-top:3px;}
+.cbh-last4{font-size:11px;color:rgba(255,255,255,.78);letter-spacing:.05em;}
+.cbh-bottom{position:relative;z-index:1;margin-top:22px;}
+.cbh-label{font-size:9.5px;color:rgba(255,255,255,.66);text-transform:uppercase;letter-spacing:.05em;}
+.cbh-value{font-family:var(--font-display);font-size:25px;font-weight:850;line-height:1.05;margin-top:3px;}
+.cbh-bar{height:6px;background:rgba(255,255,255,.2);border-radius:8px;overflow:hidden;margin-top:10px;}
+.cbh-bar-fill{height:100%;background:#fff;border-radius:8px;}
+.breakdown-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+.breakdown-stat{padding:12px;border:1px solid var(--border);border-radius:14px;background:var(--surface-2);min-width:0;}
+.breakdown-stat-label{font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.05em;}
+.breakdown-stat-value{font-family:var(--font-display);font-size:13px;font-weight:800;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.breakdown-section-title{display:flex;justify-content:space-between;align-items:center;margin:4px 2px 9px;}
+.breakdown-section-title h4{font-size:12px;font-weight:800;margin:0;}
+.breakdown-section-title span{font-size:10px;color:var(--text-faint);}
+.breakdown-item{width:100%;text-align:left;border:1px solid var(--border);background:var(--surface);border-radius:15px;padding:13px;margin-bottom:9px;color:var(--text);cursor:pointer;transition:transform .2s var(--ease),border-color .2s var(--ease),box-shadow .2s var(--ease);}
+.breakdown-item:active{transform:scale(.985);}
+.breakdown-item:hover{border-color:var(--border-strong);box-shadow:var(--shadow-sm);}
+.bi-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.bi-main{min-width:0;}
+.bi-name{font-size:12px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bi-meta{font-size:10px;color:var(--text-faint);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bi-right{text-align:right;flex-shrink:0;}
+.bi-amount{font-family:var(--font-display);font-size:12px;font-weight:800;}
+.bi-status{display:inline-flex;margin-top:4px;padding:3px 7px;border-radius:999px;font-size:9px;font-weight:800;background:var(--surface-2);}
+.bi-progress{display:flex;align-items:center;gap:8px;margin-top:10px;}
+.bi-track{height:5px;flex:1;border-radius:8px;background:rgba(148,163,184,.12);overflow:hidden;}
+.bi-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--indigo),var(--purple));}
+.bi-progress-label{font-size:9px;color:var(--text-faint);white-space:nowrap;}
+.card-breakdown-scroll{padding-bottom:4px;}
+@media(max-width:480px){
+  .card-breakdown-sheet{max-height:92vh;padding-left:14px;padding-right:14px;}
+  .breakdown-stats{gap:6px;}
+  .breakdown-stat{padding:10px 9px;}
+}
+
 .alert-badge{ min-width:18px; height:18px; padding:0 5px; border-radius:9px; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; background:var(--rose); color:#fff; margin-left:-4px; }
 .category-icon{ display:inline-flex; vertical-align:-4px; width:15px; height:15px; margin-right:3px; }
 .category-icon svg{ stroke-width:1.9; }
@@ -826,6 +876,34 @@ td.num{ font-family:var(--font-display); font-weight:700; font-variant-numeric:t
 .cycle-groups{display:flex;flex-direction:column;gap:12px}.cycle-group{border:1px solid var(--border);border-radius:15px;overflow:hidden;background:var(--surface)}.cycle-head{display:flex;justify-content:space-between;gap:10px;padding:12px 14px;background:var(--surface-2)}.cycle-title{font-weight:800;font-size:12.5px}.cycle-total{font-family:var(--font-display);font-weight:800;font-size:12px}.cycle-body{padding:4px 14px}.cycle-line{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--border);font-size:11.5px}.cycle-line:first-child{border-top:0}.cycle-line .muted{color:var(--text-faint)}
 @media(max-width:1024px){.topbar{display:flex;flex-direction:column;align-items:stretch;gap:10px}.topbar-left{width:100%}.topbar-actions{width:100%;display:flex;flex-wrap:nowrap}.topbar-actions .searchbox{flex:1;width:auto;min-width:0}.topbar-actions .btn{flex-shrink:0}.table-wrap{display:block!important}.mobile-list{display:none!important}.data-grid{display:none}.view-switcher{overflow-x:auto;flex-wrap:nowrap;padding-bottom:3px}.view-btn{flex-shrink:0}}
 
+
+/* PREMIUM V2 — safe payment editing + mobile scrolling */
+#scheduleSheet,#cardBreakdownSheet,#paymentConfirmSheet,#aiCorrectionSheet{
+  max-height:92vh;
+  display:flex;
+  flex-direction:column;
+}
+#scheduleSheet .sheet-head,#scheduleSheet .sched-stats,#scheduleSheet .sched-legend,#scheduleSheet .sheet-actions,
+#cardBreakdownSheet .sheet-head,#cardBreakdownSheet .sched-stats,#cardBreakdownSheet .sheet-actions,
+#paymentConfirmSheet .sheet-head,#paymentConfirmSheet .sheet-actions,
+#aiCorrectionSheet .sheet-head,#aiCorrectionSheet .sheet-actions{flex-shrink:0}
+.premium-schedule-scroll{min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:4px 2px 10px}
+.payment-row{display:flex;align-items:center;gap:12px;padding:13px 4px;border-bottom:1px solid var(--border)}
+.payment-check{width:22px;height:22px;flex:0 0 22px;border-radius:7px;border:1px solid var(--border-strong);display:grid;place-items:center;cursor:pointer;background:var(--surface-2)}
+.payment-check.paid{border-color:var(--emerald);background:rgba(16,185,129,.10)}
+.payment-check svg{width:15px;height:15px}
+.payment-main{min-width:0;flex:1}
+.payment-title{font-weight:750;font-size:12.5px}
+.payment-meta{font-size:10.5px;color:var(--text-faint);margin-top:3px}
+.payment-amount{font-family:var(--font-display);font-weight:800;font-size:12.5px;white-space:nowrap}
+.payment-status{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-top:3px}
+.payment-status.paid{color:var(--emerald)}
+.payment-status.unpaid{color:var(--text-faint)}
+.paid-lock{font-size:9px;color:var(--text-faint);margin-top:3px}
+.confirm-copy{font-size:12px;color:var(--text-dim);line-height:1.55;margin:0 0 14px}
+.confirm-amount{font-family:var(--font-display);font-size:22px;font-weight:800;margin:2px 0}
+.confirm-date{font-size:11px;color:var(--text-faint)}
+
 </style>
 </head>
 <body>
@@ -1104,6 +1182,12 @@ td.num{ font-family:var(--font-display); font-weight:700; font-variant-numeric:t
 <!-- ============ SCHEDULE OVERLAY ============ -->
 <div class="overlay" id="scheduleOverlay">
   <div class="sheet" id="scheduleSheet"></div>
+</div>
+
+
+<!-- ============ MOBILE CARD BREAKDOWN OVERLAY ============ -->
+<div class="overlay" id="cardBreakdownOverlay">
+  <div class="sheet card-breakdown-sheet" id="cardBreakdownSheet"></div>
 </div>
 
 <!-- ============ ADD ITEM OVERLAY ============ -->
@@ -1473,9 +1557,10 @@ function renderCardSwitchers(){
         <div class="wc-avail-label">${card.type==='credit' ? 'Available Credit' : 'Outstanding Balance'}</div>
         <div class="wc-avail">${fmtCompact(card.type==='credit' ? c.available : c.used)}</div>
         <div class="wc-bar"><div class="wc-bar-fill" style="width:${pct}%;"></div></div>
+        <div class="wc-details-cta">View breakdown <span>›</span></div>
       </div>
     `;
-    wc.onclick = ()=>{ filters.activeCardId = (filters.activeCardId===card.id ? 'all' : card.id); renderAll(); };
+    wc.onclick = ()=>{ openCardBreakdown(card.id); };
     mobWrap.appendChild(wc);
   });
 }
@@ -1658,6 +1743,160 @@ function renderTableAndList(){
   });
 }
 
+
+/* ============================================================
+   MOBILE CARD BREAKDOWN
+   ============================================================ */
+let currentCardBreakdown = null;
+function openCardBreakdown(cardId){
+  currentCardBreakdown = cardId;
+  renderCardBreakdown();
+  document.getElementById('cardBreakdownOverlay').classList.add('open');
+  document.body.classList.add('sheet-open');
+}
+function closeCardBreakdown(){
+  document.getElementById('cardBreakdownOverlay').classList.remove('open');
+  currentCardBreakdown = null;
+  document.body.classList.remove('sheet-open');
+}
+function renderCardBreakdown(){
+  if(!currentCardBreakdown) return;
+  const card=findCard(currentCardBreakdown);
+  if(!card) return;
+  const c=computeCard(card);
+  const pct=Math.min(100,Math.max(0,Math.round(c.utilization)));
+  const rows=card.items.map(item=>{
+    const x=computeItem(item);
+    const progress=item.term ? Math.round((x.paidCount/item.term)*100) : 0;
+    const meta=item.paymentType==='installment' ? `${fmt(x.monthly)}/month · ${x.paidCount}/${item.term} paid` : 'One-time charge';
+    const status=STATUS_META[x.status];
+    return `<button class="breakdown-item" data-item-id="${item.id}" type="button">
+      <div class="bi-top"><div class="bi-main"><div class="bi-name">${escAI(item.name)}</div><div class="bi-meta">${escAI(item.category)} · ${meta}${item.borrowerName?' · '+escAI(item.borrowerName):''}</div></div>
+      <div class="bi-right"><div class="bi-amount">${fmtCompact(x.remaining)}</div><span class="bi-status" style="color:${status.color};">${status.label}</span></div></div>
+      <div class="bi-progress"><div class="bi-track"><div class="bi-fill" style="width:${progress}%;"></div></div><span class="bi-progress-label">${progress}% paid</span></div>
+    </button>`;
+  }).join('');
+  const availableLabel=card.type==='credit'?'Available Credit':'Outstanding Balance';
+  const available=card.type==='credit'?c.available:c.used;
+  const usedLabel=card.type==='credit'?'Used':'Outstanding';
+  document.getElementById('cardBreakdownSheet').innerHTML=`
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <div><div class="sheet-title">${escAI(card.bank)} Breakdown</div><div class="sheet-title-sub">${card.type==='credit'?'Credit Card':'Loan Account'}${card.type==='credit'?' · •• '+card.last4:''}</div></div>
+      <button class="sheet-close" id="cardBreakdownClose" aria-label="Close"><span class="icon"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></span></button>
+    </div>
+    <div class="card-breakdown-scroll sheet-scroll">
+      <div class="card-breakdown-hero" style="background:linear-gradient(135deg,${card.brand.from},${card.brand.to});">
+        <div class="cbh-top"><div><div class="cbh-bank">${escAI(card.bank)}</div><div class="cbh-type">${card.type==='credit'?'Credit Card':'Loan Account'}</div></div><div class="cbh-last4">${card.type==='credit'?'•• '+card.last4:''}</div></div>
+        <div class="cbh-bottom"><div class="cbh-label">${availableLabel}</div><div class="cbh-value">${fmt(available)}</div><div class="cbh-bar"><div class="cbh-bar-fill" style="width:${pct}%;"></div></div></div>
+      </div>
+      <div class="breakdown-stats">
+        <div class="breakdown-stat"><div class="breakdown-stat-label">Limit</div><div class="breakdown-stat-value">${fmtCompact(card.limit)}</div></div>
+        <div class="breakdown-stat"><div class="breakdown-stat-label">${usedLabel}</div><div class="breakdown-stat-value">${fmtCompact(c.used)}</div></div>
+        <div class="breakdown-stat"><div class="breakdown-stat-label">Overdue</div><div class="breakdown-stat-value" style="color:${c.overdueCount?'var(--rose)':'var(--emerald)'}">${c.overdueCount}</div></div>
+      </div>
+      <div class="breakdown-section-title"><h4>Purchases &amp; Loans</h4><span>${card.items.length} item${card.items.length===1?'':'s'}</span></div>
+      ${rows || '<div class="empty-state"><h4>No items yet</h4><p>This account has no recorded purchases.</p></div>'}
+    </div>
+  `;
+  document.getElementById('cardBreakdownClose').onclick=closeCardBreakdown;
+  document.querySelectorAll('#cardBreakdownSheet .breakdown-item').forEach(btn=>{
+    btn.onclick=()=>openSchedule(card.id,btn.dataset.itemId);
+  });
+}
+
+
+/* ============================================================
+   PREMIUM V2 — CARD BREAKDOWN + SAFE PAYMENT CONFIRMATION
+   ============================================================ */
+let currentCardBreakdown=null;
+let pendingPaymentAction=null;
+
+function openCardBreakdown(cardId){
+  currentCardBreakdown=cardId; renderCardBreakdown();
+  document.getElementById('cardBreakdownOverlay').classList.add('open');
+}
+function closeCardBreakdown(){
+  document.getElementById('cardBreakdownOverlay').classList.remove('open');
+  currentCardBreakdown=null;
+}
+function renderCardBreakdown(){
+  const card=findCard(currentCardBreakdown), sheet=document.getElementById('cardBreakdownSheet');
+  if(!card||!sheet)return;
+  const items=card.items||[];
+  const outstanding=items.reduce((s,i)=>s+(computeItem(i).remaining||0),0);
+  const paid=items.reduce((s,i)=>s+(i.paid||[]).filter(Boolean).length,0);
+  const total=items.reduce((s,i)=>s+(i.term||1),0);
+  sheet.innerHTML=`
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><div><div class="sheet-title">${escAI(card.bank)}</div><div class="sheet-title-sub">${card.type==='credit'?'Credit Card · •• '+escAI(card.last4||''):'Loan account'}</div></div>
+    <button class="sheet-close" id="cardBreakClose"><span class="icon"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></span></button></div>
+    <div class="sched-stats">
+      <div class="sched-stat"><div class="sched-stat-label">Outstanding</div><div class="sched-stat-value">${fmt(outstanding)}</div></div>
+      <div class="sched-stat"><div class="sched-stat-label">Payments</div><div class="sched-stat-value">${paid}/${total}</div></div>
+      <div class="sched-stat"><div class="sched-stat-label">Items</div><div class="sched-stat-value">${items.length}</div></div>
+    </div>
+    <div class="premium-schedule-scroll">
+      ${items.length?items.map(item=>{
+        const c=computeItem(item), pc=(item.paid||[]).filter(Boolean).length;
+        return `<button class="list-item" style="width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--border);padding:14px 4px;cursor:pointer" data-break-item="${escAI(item.id)}">
+          <div class="list-main"><div class="list-title">${escAI(item.name)}</div><div class="list-meta">${escAI(item.category||'Purchase')} · ${pc}/${item.term||1} paid</div></div>
+          <div class="list-amount">${fmt(c.remaining||0)}</div>
+        </button>`;
+      }).join(''):'<div class="empty-state"><h4>No items on this account</h4><p>Add a purchase or loan to see its breakdown here.</p></div>'}
+    </div>
+    <div class="sheet-actions"><button class="btn" id="cardBreakCloseBtn">Close</button></div>`;
+  sheet.querySelector('#cardBreakClose').onclick=closeCardBreakdown;
+  sheet.querySelector('#cardBreakCloseBtn').onclick=closeCardBreakdown;
+  sheet.querySelectorAll('[data-break-item]').forEach(el=>el.onclick=()=>{
+    const id=el.dataset.breakItem; closeCardBreakdown(); openSchedule(card.id,id);
+  });
+}
+
+function openPaymentConfirm(cardId,itemId,index){
+  const card=findCard(cardId), item=findItem(cardId,itemId); if(!card||!item)return;
+  pendingPaymentAction={cardId,itemId,index};
+  const amount=item.totalAmount/(item.term||1), date=itemDueDate(item,index);
+  const sheet=document.getElementById('paymentConfirmSheet');
+  sheet.innerHTML=`
+    <div class="sheet-handle"></div><div class="sheet-head"><div><div class="sheet-title">Mark Payment as Paid?</div>
+    <div class="sheet-title-sub">${escAI(item.name)} · Payment ${index+1} of ${item.term||1}</div></div>
+    <button class="sheet-close" id="payConfirmClose"><span class="icon"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></span></button></div>
+    <p class="confirm-copy">Are you sure this payment has been paid? Opening a payment never changes its status.</p>
+    <div class="confirm-amount">${fmt(amount)}</div><div class="confirm-date">Due ${date?fmtDate(date.toISOString().slice(0,10)):'—'}</div>
+    <div class="sheet-actions"><button class="btn" id="payConfirmCancel">Cancel</button><button class="btn primary" id="payConfirmYes">Yes, Mark Paid</button></div>`;
+  document.getElementById('paymentConfirmOverlay').classList.add('open');
+  sheet.querySelector('#payConfirmClose').onclick=closePaymentConfirm;
+  sheet.querySelector('#payConfirmCancel').onclick=closePaymentConfirm;
+  sheet.querySelector('#payConfirmYes').onclick=()=>{
+    const p=pendingPaymentAction,it=findItem(p.cardId,p.itemId); if(!it)return;
+    it.paid[p.index]=true; if(!it.paidAt)it.paidAt=[]; it.paidAt[p.index]=new Date().toISOString();
+    saveState();renderAll();closePaymentConfirm();renderScheduleSheet();toast(`Payment ${p.index+1} marked as paid`);
+  };
+}
+function closePaymentConfirm(){document.getElementById('paymentConfirmOverlay').classList.remove('open');pendingPaymentAction=null;}
+
+function openAiPaidCorrection(cardId,itemId,index){
+  const item=findItem(cardId,itemId); if(!item)return;
+  const amount=item.totalAmount/(item.term||1),date=itemDueDate(item,index),sheet=document.getElementById('aiCorrectionSheet');
+  sheet.innerHTML=`
+    <div class="sheet-handle"></div><div class="sheet-head"><div><div class="sheet-title">AI Payment Correction</div>
+    <div class="sheet-title-sub">${escAI(item.name)} · Payment ${index+1}</div></div>
+    <button class="sheet-close" id="aiCorrClose"><span class="icon"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></span></button></div>
+    <p class="confirm-copy">This payment is currently <b>PAID</b>. To prevent accidental edits, tell creDble you need to correct this payment, then confirm the change.</p>
+    <div class="confirm-amount">${fmt(amount)}</div><div class="confirm-date">Due ${date?fmtDate(date.toISOString().slice(0,10)):'—'}</div>
+    <div class="sheet-actions"><button class="btn" id="aiCorrKeep">Keep Paid</button><button class="btn primary" id="aiCorrYes">Yes, Mark Unpaid</button></div>`;
+  document.getElementById('aiCorrectionOverlay').classList.add('open');
+  sheet.querySelector('#aiCorrClose').onclick=closeAiPaidCorrection;
+  sheet.querySelector('#aiCorrKeep').onclick=closeAiPaidCorrection;
+  sheet.querySelector('#aiCorrYes').onclick=()=>{
+    const it=findItem(cardId,itemId);it.paid[index]=false;if(it.paidAt)it.paidAt[index]=null;
+    saveState();renderAll();closeAiPaidCorrection();renderScheduleSheet();toast(`Payment ${index+1} marked as unpaid`);
+  };
+}
+function closeAiPaidCorrection(){document.getElementById('aiCorrectionOverlay').classList.remove('open');}
+function askAiToCorrectPaid(cardId,itemId,index){openAiPaidCorrection(cardId,itemId,index);}
+
 /* ============================================================
    SCHEDULE SHEET / MODAL
    ============================================================ */
@@ -1708,12 +1947,9 @@ function renderScheduleSheet(){
         <button class="btn" id="schedCloseBtn2">Close</button>
       </div>
     `;
-    sheet.querySelector('#onetimeSwitch').onclick = ()=>{
-      item.paid[0] = !item.paid[0];
-      renderScheduleSheet();
-      renderAll();
-      saveState();
-      toast(item.paid[0] ? 'Marked as paid' : 'Marked as unpaid');
+    sheet.querySelector('#onetimeSwitch').onclick=()=>{
+      if(item.paid?.[0]) askAiToCorrectPaid(cardId,itemId,0);
+      else openPaymentConfirm(cardId,itemId,0);
     };
   } else {
     let dots = '';
@@ -1747,19 +1983,30 @@ function renderScheduleSheet(){
         <span><span class="dot" style="background:var(--rose);"></span>Overdue</span>
         <span><span class="dot" style="background:var(--slate-status);"></span>Upcoming</span>
       </div>
-      <div class="sched-months">${dots}</div>
+      <div class="premium-schedule-scroll">
+        ${Array.from({length:item.term},(_,i)=>{
+          const isPaid=!!item.paid?.[i], due=itemDueDate(item,i), amount=item.totalAmount/(item.term||1);
+          return `<div class="payment-row">
+            <button class="payment-check ${isPaid?'paid':''}" data-pay-index="${i}" aria-label="${isPaid?'Paid':'Unpaid'} payment ${i+1}">
+              ${isPaid?'<svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" style="stroke:var(--emerald);fill:none;stroke-width:2.4;stroke-linecap:round;"/></svg>':''}
+            </button>
+            <div class="payment-main"><div class="payment-title">Payment ${i+1} of ${item.term}</div>
+            <div class="payment-meta">Due ${due?fmtDate(due.toISOString().slice(0,10)):'—'}</div>
+            <div class="payment-status ${isPaid?'paid':'unpaid'}">${isPaid?'Paid':'Unpaid'}</div>
+            ${isPaid?'<div class="paid-lock">Status protected · Ask AI to correct</div>':''}</div>
+            <div class="payment-amount">${fmt(amount)}</div>
+          </div>`;
+        }).join('')}
+      </div>
       <div class="sheet-actions">
         <button class="btn" id="schedCloseBtn2">Close</button>
       </div>
     `;
-    sheet.querySelectorAll('.month-dot').forEach(dot=>{
-      dot.onclick = ()=>{
-        const idx = parseInt(dot.dataset.idx, 10);
-        item.paid[idx] = !item.paid[idx];
-        renderScheduleSheet();
-        renderAll();
-        saveState();
-        toast(item.paid[idx] ? `Month ${idx+1} marked as paid` : `Month ${idx+1} marked as unpaid`);
+    sheet.querySelectorAll('.payment-check').forEach(btn=>{
+      btn.onclick=()=>{
+        const idx=parseInt(btn.dataset.payIndex,10);
+        if(item.paid?.[idx]) askAiToCorrectPaid(cardId,itemId,idx);
+        else openPaymentConfirm(cardId,itemId,idx);
       };
     });
   }
@@ -2451,6 +2698,8 @@ document.getElementById('addCancel').onclick = closeAdd;
 
 document.getElementById('addOverlay').addEventListener('click', (e)=>{ if(e.target.id==='addOverlay') closeAdd(); });
 document.getElementById('scheduleOverlay').addEventListener('click', (e)=>{ if(e.target.id==='scheduleOverlay') closeSchedule(); });
+document.getElementById('cardBreakdownOverlay').addEventListener('click', (e)=>{ if(e.target.id==='cardBreakdownOverlay') closeCardBreakdown(); });
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ closeCardBreakdown(); closeSchedule(); closeAdd(); } });
 
 document.querySelectorAll('#fTypeSeg .seg-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
