@@ -930,6 +930,31 @@ body.sheet-open{overflow:hidden;}
 .smart-badge{display:inline-flex;align-items:center;padding:3px 6px;border-radius:999px;background:var(--surface);border:1px solid var(--border);font-size:8.5px;font-weight:800;color:var(--text-faint);margin-left:5px}
 @media(max-width:480px){.smart-ai-input{flex-direction:column}.smart-ai-input .btn{width:100%}}
 
+/* ============================================================
+   MOBILE PARALLEL UX — every payment/AI update is available on mobile
+   ============================================================ */
+@media (max-width:1024px){
+  .table-wrap{display:none!important;}
+  .mobile-list{display:flex!important;}
+  .smart-ai{margin-top:12px;padding:12px;}
+  .smart-ai-input{display:grid;grid-template-columns:1fr;gap:8px;}
+  .smart-ai-input .btn{width:100%;min-height:42px;}
+  .smart-ai-input input{min-height:42px;font-size:16px;}
+  .smart-actions{display:grid!important;grid-template-columns:1fr 1fr;gap:8px!important;}
+  .smart-actions .btn{width:100%;min-height:40px;}
+  #paymentConfirmSheet,#aiCorrectionSheet{width:100%;max-width:100%;border-radius:22px 22px 0 0;}
+  #paymentConfirmSheet .sheet-actions,#aiCorrectionSheet .sheet-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  #paymentConfirmSheet .sheet-actions .btn,#aiCorrectionSheet .sheet-actions .btn{width:100%;min-height:44px;}
+  .payment-row{padding:14px 2px;gap:10px;}
+  .payment-check{width:28px;height:28px;flex-basis:28px;border-radius:9px;touch-action:manipulation;}
+  .payment-check svg{width:17px;height:17px;}
+  .payment-amount{font-size:12px;}
+  .m-item{min-height:68px;touch-action:manipulation;}
+  .m-item::after{content:'›';font-size:22px;color:var(--text-faint);margin-left:5px;}
+  .check-item .paid-check,.excel-table .paid-check{width:24px;height:24px;touch-action:manipulation;}
+}
+
+
 </style>
 </head>
 <body>
@@ -1851,7 +1876,7 @@ function openPaymentConfirm(cardId,itemId,index){
     <div class="sheet-handle"></div><div class="sheet-head"><div><div class="sheet-title">Mark Payment as Paid?</div>
     <div class="sheet-title-sub">${escAI(item.name)} · Payment ${index+1} of ${item.term||1}</div></div>
     <button class="sheet-close" id="payConfirmClose"><span class="icon"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></span></button></div>
-    <p class="confirm-copy">Are you sure this payment has been paid? Opening a payment never changes its status.</p>
+    <p class="confirm-copy">Are you sure this payment has been paid? Check the amount and due date below. Nothing changes until you tap “Yes, Mark Paid”.</p>
     <div class="confirm-amount">${fmt(amount)}</div><div class="confirm-date">Due ${date?fmtDate(date.toISOString().slice(0,10)):'—'}</div>
     <div class="sheet-actions"><button class="btn" id="payConfirmCancel">Cancel</button><button class="btn primary" id="payConfirmYes">Yes, Mark Paid</button></div>`;
   document.getElementById('paymentConfirmOverlay').classList.add('open');
@@ -2269,7 +2294,7 @@ function openImportedPaymentConfirm(row){
       <div class="sheet-title">${markingPaid?'Mark Payment as Paid?':'Mark Payment as Unpaid?'}</div>
       <div class="sheet-title-sub">${escAI(row.itemName||row.name||'Payment')}${row.merchant?' · '+escAI(row.merchant):''}</div>
     </div><button class="sheet-close" id="payConfirmClose"><span class="icon"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></span></button></div>
-    <p class="confirm-copy">Are you sure you want to ${markingPaid?'mark this payment as paid':'mark this payment as unpaid'}? This action will update the payment status.</p>
+    <p class="confirm-copy">Are you sure you want to ${markingPaid?'mark this payment as paid':'mark this payment as unpaid'}? Check the amount and date below before confirming. This updates the payment status on both web and mobile views.</p>
     <div class="confirm-amount">${fmt(Number(row.amount)||0)}</div>
     <div class="confirm-date">${row.date?escAI(String(row.date)):'Payment status'}</div>
     <div class="sheet-actions"><button class="btn" id="payConfirmCancel">Cancel</button><button class="btn primary" id="payConfirmYes">${markingPaid?'Yes, Mark Paid':'Yes, Mark Unpaid'}</button></div>`;
@@ -2340,7 +2365,7 @@ function renderImportedViews(){
       const body = g.rows.map((r,gi)=>{ const i=g.indices[gi]; return `<tr class="data-row"><td><input class="paid-check" type="checkbox" ${r.paid?'checked':''} data-xrow="${i}"><span class="paid-time">${r.paidAt?new Date(r.paidAt).toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short'}):''}</span></td><td>${r.date}</td><td>${r.name}</td><td>${r.merchant}</td><td>${r.borrowerName||'—'}</td><td class="amount">${fmt(r.amount)}</td></tr>`; }).join('');
       return header+body;
     }).join('')}</tbody></table>`;
-    excel.querySelectorAll('.paid-check').forEach((el,i)=>el.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();openImportedPaymentConfirm(rows[i]);}));
+    excel.querySelectorAll('.paid-check').forEach(el=>el.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const idx=Number(el.dataset.xrow);const row=rows[idx];if(row)openImportedPaymentConfirm(row);}));
   } else if(currentView==='checklist'){
     checklist.style.display='flex'; checklist.style.flexDirection='column'; checklist.style.gap='14px';
     checklist.innerHTML=groups.map(g=>{
@@ -2349,7 +2374,7 @@ function renderImportedViews(){
       const items = g.rows.map((r,gi)=>{ const i=g.indices[gi]; return `<div class="check-item"><input class="paid-check" type="checkbox" ${r.paid?'checked':''} data-i="${i}"><div class="check-main"><div class="check-name">${r.merchant}</div><div class="check-sub">${r.date} · ${r.name} · ${r.sheet}${r.borrowerName?' · '+r.borrowerName:''}</div></div><div class="check-right"><div class="check-amt">${fmt(r.amount)}</div><div class="check-paid">${r.paid?(r.paidAt?'Paid · '+new Date(r.paidAt).toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short'}):'Paid'): 'Unpaid'}</div></div></div>`; }).join('');
       return `<div class="check-group">${header}<div class="check-group-body">${items}</div></div>`;
     }).join('');
-    checklist.querySelectorAll('.paid-check').forEach((el,i)=>el.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();openImportedPaymentConfirm(rows[i]);}));
+    checklist.querySelectorAll('.paid-check').forEach(el=>el.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();const idx=Number(el.dataset.i);const row=rows[idx];if(row)openImportedPaymentConfirm(row);}));
   } else {
     cycles.style.display='flex';
     const cgroups={}; rows.forEach(r=>{const key=`${r.sheet} · ${r.cycle}`;(cgroups[key]??=[]).push(r);});
