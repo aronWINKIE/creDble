@@ -1190,6 +1190,16 @@ body.sheet-open{overflow:hidden;}
   <div class="sheet card-breakdown-sheet" id="cardBreakdownSheet"></div>
 </div>
 
+<!-- ============ PAYMENT CONFIRMATION OVERLAY ============ -->
+<div class="overlay" id="paymentConfirmOverlay">
+  <div class="sheet" id="paymentConfirmSheet"></div>
+</div>
+
+<!-- ============ AI PAID CORRECTION OVERLAY ============ -->
+<div class="overlay" id="aiCorrectionOverlay">
+  <div class="sheet" id="aiCorrectionSheet"></div>
+</div>
+
 <!-- ============ ADD ITEM OVERLAY ============ -->
 <div class="overlay" id="addOverlay">
   <div class="sheet">
@@ -2640,6 +2650,8 @@ document.getElementById('addCancel').onclick = closeAdd;
 document.getElementById('addOverlay').addEventListener('click', (e)=>{ if(e.target.id==='addOverlay') closeAdd(); });
 document.getElementById('scheduleOverlay').addEventListener('click', (e)=>{ if(e.target.id==='scheduleOverlay') closeSchedule(); });
 const _cardBreakdownOverlay=document.getElementById('cardBreakdownOverlay'); if(_cardBreakdownOverlay) _cardBreakdownOverlay.addEventListener('click', (e)=>{ if(e.target.id==='cardBreakdownOverlay') closeCardBreakdown(); });
+const _paymentConfirmOverlay=document.getElementById('paymentConfirmOverlay'); if(_paymentConfirmOverlay) _paymentConfirmOverlay.addEventListener('click', (e)=>{ if(e.target.id==='paymentConfirmOverlay') closePaymentConfirm(); });
+const _aiCorrectionOverlay=document.getElementById('aiCorrectionOverlay'); if(_aiCorrectionOverlay) _aiCorrectionOverlay.addEventListener('click', (e)=>{ if(e.target.id==='aiCorrectionOverlay') closeAiPaidCorrection(); });
 document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ closeCardBreakdown(); closeSchedule(); closeAdd(); } });
 
 document.querySelectorAll('#fTypeSeg .seg-btn').forEach(btn=>{
