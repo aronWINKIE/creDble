@@ -1747,65 +1747,6 @@ function renderTableAndList(){
 /* ============================================================
    MOBILE CARD BREAKDOWN
    ============================================================ */
-let currentCardBreakdown = null;
-function openCardBreakdown(cardId){
-  currentCardBreakdown = cardId;
-  renderCardBreakdown();
-  document.getElementById('cardBreakdownOverlay').classList.add('open');
-  document.body.classList.add('sheet-open');
-}
-function closeCardBreakdown(){
-  document.getElementById('cardBreakdownOverlay').classList.remove('open');
-  currentCardBreakdown = null;
-  document.body.classList.remove('sheet-open');
-}
-function renderCardBreakdown(){
-  if(!currentCardBreakdown) return;
-  const card=findCard(currentCardBreakdown);
-  if(!card) return;
-  const c=computeCard(card);
-  const pct=Math.min(100,Math.max(0,Math.round(c.utilization)));
-  const rows=card.items.map(item=>{
-    const x=computeItem(item);
-    const progress=item.term ? Math.round((x.paidCount/item.term)*100) : 0;
-    const meta=item.paymentType==='installment' ? `${fmt(x.monthly)}/month · ${x.paidCount}/${item.term} paid` : 'One-time charge';
-    const status=STATUS_META[x.status];
-    return `<button class="breakdown-item" data-item-id="${item.id}" type="button">
-      <div class="bi-top"><div class="bi-main"><div class="bi-name">${escAI(item.name)}</div><div class="bi-meta">${escAI(item.category)} · ${meta}${item.borrowerName?' · '+escAI(item.borrowerName):''}</div></div>
-      <div class="bi-right"><div class="bi-amount">${fmtCompact(x.remaining)}</div><span class="bi-status" style="color:${status.color};">${status.label}</span></div></div>
-      <div class="bi-progress"><div class="bi-track"><div class="bi-fill" style="width:${progress}%;"></div></div><span class="bi-progress-label">${progress}% paid</span></div>
-    </button>`;
-  }).join('');
-  const availableLabel=card.type==='credit'?'Available Credit':'Outstanding Balance';
-  const available=card.type==='credit'?c.available:c.used;
-  const usedLabel=card.type==='credit'?'Used':'Outstanding';
-  document.getElementById('cardBreakdownSheet').innerHTML=`
-    <div class="sheet-handle"></div>
-    <div class="sheet-head">
-      <div><div class="sheet-title">${escAI(card.bank)} Breakdown</div><div class="sheet-title-sub">${card.type==='credit'?'Credit Card':'Loan Account'}${card.type==='credit'?' · •• '+card.last4:''}</div></div>
-      <button class="sheet-close" id="cardBreakdownClose" aria-label="Close"><span class="icon"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></span></button>
-    </div>
-    <div class="card-breakdown-scroll sheet-scroll">
-      <div class="card-breakdown-hero" style="background:linear-gradient(135deg,${card.brand.from},${card.brand.to});">
-        <div class="cbh-top"><div><div class="cbh-bank">${escAI(card.bank)}</div><div class="cbh-type">${card.type==='credit'?'Credit Card':'Loan Account'}</div></div><div class="cbh-last4">${card.type==='credit'?'•• '+card.last4:''}</div></div>
-        <div class="cbh-bottom"><div class="cbh-label">${availableLabel}</div><div class="cbh-value">${fmt(available)}</div><div class="cbh-bar"><div class="cbh-bar-fill" style="width:${pct}%;"></div></div></div>
-      </div>
-      <div class="breakdown-stats">
-        <div class="breakdown-stat"><div class="breakdown-stat-label">Limit</div><div class="breakdown-stat-value">${fmtCompact(card.limit)}</div></div>
-        <div class="breakdown-stat"><div class="breakdown-stat-label">${usedLabel}</div><div class="breakdown-stat-value">${fmtCompact(c.used)}</div></div>
-        <div class="breakdown-stat"><div class="breakdown-stat-label">Overdue</div><div class="breakdown-stat-value" style="color:${c.overdueCount?'var(--rose)':'var(--emerald)'}">${c.overdueCount}</div></div>
-      </div>
-      <div class="breakdown-section-title"><h4>Purchases &amp; Loans</h4><span>${card.items.length} item${card.items.length===1?'':'s'}</span></div>
-      ${rows || '<div class="empty-state"><h4>No items yet</h4><p>This account has no recorded purchases.</p></div>'}
-    </div>
-  `;
-  document.getElementById('cardBreakdownClose').onclick=closeCardBreakdown;
-  document.querySelectorAll('#cardBreakdownSheet .breakdown-item').forEach(btn=>{
-    btn.onclick=()=>openSchedule(card.id,btn.dataset.itemId);
-  });
-}
-
-
 /* ============================================================
    PREMIUM V2 — CARD BREAKDOWN + SAFE PAYMENT CONFIRMATION
    ============================================================ */
@@ -2698,7 +2639,7 @@ document.getElementById('addCancel').onclick = closeAdd;
 
 document.getElementById('addOverlay').addEventListener('click', (e)=>{ if(e.target.id==='addOverlay') closeAdd(); });
 document.getElementById('scheduleOverlay').addEventListener('click', (e)=>{ if(e.target.id==='scheduleOverlay') closeSchedule(); });
-document.getElementById('cardBreakdownOverlay').addEventListener('click', (e)=>{ if(e.target.id==='cardBreakdownOverlay') closeCardBreakdown(); });
+const _cardBreakdownOverlay=document.getElementById('cardBreakdownOverlay'); if(_cardBreakdownOverlay) _cardBreakdownOverlay.addEventListener('click', (e)=>{ if(e.target.id==='cardBreakdownOverlay') closeCardBreakdown(); });
 document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ closeCardBreakdown(); closeSchedule(); closeAdd(); } });
 
 document.querySelectorAll('#fTypeSeg .seg-btn').forEach(btn=>{
